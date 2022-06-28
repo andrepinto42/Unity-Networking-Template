@@ -44,7 +44,8 @@ public class ManagerInterface : NetworkBehaviour
         }
         else
         {
-            onClickHostLobby();
+            //Only for Debug Purposes
+            // onClickHostLobby();
         }
     }
 
