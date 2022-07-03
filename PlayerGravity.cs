@@ -6,12 +6,13 @@ using System;
 using TMPro;
 public class PlayerGravity : MonoBehaviour
 {
-    public float gravityForce = -9.81f;
-    public float timeToLand = 2f;
+    public float gravityForce = 9.81f;
+    public float timeToLand = 10f;
     public float maxGravity = 4f;
-    public float jumpHeight = 10f;
+    public float jumpHeight = 0.4f;
     public bool isGrounded = false;
     public bool isJumping = false;
+    public bool isFalling = false;
     [SerializeField] LayerMask LayerToCollide;
     [Header("Player Configurations")]
     public float maxDistanceToGround = 0.2f;
@@ -34,9 +35,14 @@ public class PlayerGravity : MonoBehaviour
         // 0.1f is the padding so it doenst line perfectly with the mesh
         vectorSizeFeet = new Vector3(SphereRadiusCollision*1.25f,0.2f,SphereRadiusCollision*1.25f) ;
         
+        //Just negate the value
+        maxGravity = -maxGravity;
+        gravityForce = -gravityForce;
+
         //Just to make sure
         isJumping = false;
         isGrounded = false;
+        isFalling = false;
     }
 
     public virtual void Update()
@@ -47,15 +53,27 @@ public class PlayerGravity : MonoBehaviour
     {
         isGrounded = CheckIfGrounded(); 
 
+        //If the player just found ground floor then he is grounded
+        if (isGrounded && isFalling)
+        {
+            isFalling = false;
+        }
         //Case exist a animator
         if (_animator)
         {
             _animator.SetBool("isJumping",isJumping);
         }
 
-        //Decrease the current y velocity over time
-        if (currentY_Velocity < maxGravity)
+        if (currentY_Velocity <=0f)
+        {
+            //Player now has negative velocity
+            currentY_Velocity = maxGravity * Time.deltaTime;
+        }
+        else if (currentY_Velocity > 0f)
+        {
+            //Start decreasing the velocity when the player has a positive y Velocity
             currentY_Velocity += (gravityForce * Time.deltaTime) / timeToLand;
+        }
 
         if (isJumping)
         {            
@@ -64,6 +82,7 @@ public class PlayerGravity : MonoBehaviour
             if ( currentY_Velocity <= 0f)
             {
                 isJumping = false;
+                isFalling = true;
             }
         }
         
