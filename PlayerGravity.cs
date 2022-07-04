@@ -55,13 +55,19 @@ public class PlayerGravity : MonoBehaviour
 
         //If the player just found ground floor then he is grounded
         if (isGrounded && isFalling)
-        {
+        {            
             isFalling = false;
+
+            if(_animator)
+            _animator.SetBool("isFalling",false);
+
         }
-        //Case exist a animator
-        if (_animator)
+        //Player just fall down a ledge
+        else if (!isGrounded && !isJumping)
         {
-            _animator.SetBool("isJumping",isJumping);
+            isFalling = true;
+            if(_animator)
+            _animator.SetBool("isFalling",true);
         }
 
         if (currentY_Velocity <=0f)
@@ -83,6 +89,12 @@ public class PlayerGravity : MonoBehaviour
             {
                 isJumping = false;
                 isFalling = true;
+                if (_animator)
+                {
+                _animator.SetBool("isJumping",false);
+                _animator.SetBool("isFalling",true);
+
+                }
             }
         }
         
@@ -92,6 +104,11 @@ public class PlayerGravity : MonoBehaviour
         {
             isGrounded = false;
             isJumping = true;
+            if (_animator)
+            {
+                _animator.SetBool("isJumping",true);
+            }
+
             AddJumpForce();
         }
     }
